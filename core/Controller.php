@@ -9,6 +9,7 @@ abstract class Controller
     protected $response;
     protected $session;
     protected $db_manager;
+    protected $auth_actions = array();
 
     public function __construct($application)
     {
@@ -29,6 +30,11 @@ abstract class Controller
             $this->forward404();
         }
 
+        if($this->needsAuthentication($action) && !$this->session->isAuthenticated())
+        {
+            throw new UnauthorizedActionException();
+        }
+        
         $content = $this->$action_method($params);
 
         return $content;
